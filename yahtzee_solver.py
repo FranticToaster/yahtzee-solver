@@ -74,3 +74,14 @@ def dfs(
         
         cache[game] = best_score
         return best_score
+
+
+if __name__ == "__main__":
+    from time import perf_counter
+    game = Game()
+    start_time = perf_counter()
+    result = dfs(game)
+    end_time = perf_counter()
+    logger.info(f"Searched {leaf_nodes_evaluated} leaf nodes and {total_nodes_evaluated} total nodes.")
+    logger.info(f"Cache had a total of {len(cache)} entries.")
+    logger.info(f"Took {end_time - start_time}s.")

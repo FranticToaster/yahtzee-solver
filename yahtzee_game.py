@@ -151,7 +151,9 @@ class Game:
         if self.rollsLeft == 0:
             logger.error("Attempted to claim roll result with 0 rolls left in turn.")
             return
+        
         self.dices = dices
+        self.rollsLeft -= 1
 
     def getRerolls(self):
         '''Generator for possible rerolls.'''
