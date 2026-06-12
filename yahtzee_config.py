@@ -23,3 +23,4 @@ yahtzeeBonus = False
 #loaded die config
 #first element is weight for 1, second element is weight for 2 etc
 dieWeights = [6, 5, 4, 3, 2, 1]
+dieWeightsSum = sum(dieWeights)

@@ -1,13 +1,39 @@
 import logging
-import random
-from itertools import product
+from math import prod
+from itertools import product, combinations_with_replacement
 from yahtzee_locals import *
 from yahtzee_config import *
 
 logger = logging.getLogger(__name__)
 
+
+factorials = [1, 1, 2, 6, 24, 120, 720]
+
+
+def precomputeRollOutcomes() -> list[list[tuple[Dices, int]]]:
+    table = []
+
+    for i in range(6):
+        row = []
+        for combination in combinations_with_replacement(range(6), i):
+            #convert to Dices format (counts of each value)
+            dices = [0] * 6
+            for value in combination:
+                dices[value] += 1
+
+            #number of different permutations of the same combination
+            permutations = factorials[i] / prod(factorials[e] for e in dices)
+
+            probability = permutations * prod(dieWeights[value]/dieWeightsSum for value in combination)
+            row.append((dices,probability))
+        table.append(row)
+
+    return table
+
 #pretty messy but not much time is available to clean up code
 class Game:
+    #idk why i made this a class attribute instead of global var
+    rollOutcomes = precomputeRollOutcomes()
     def __init__(
             self,
             *_,
@@ -47,7 +73,7 @@ class Game:
 
         game.dices = self.dices.copy()
         game.rollsLeft = self.rollsLeft
-        return Game
+        return game
 
     def moveFitsReq(
             self,
@@ -117,28 +143,15 @@ class Game:
             return sum(count * (i+1) for i,count in enumerate(self.dices))
             
 
-    def roll(
+    def claimRoll(
             self,
-            #rerolls is stored in same format as self.dices
-            rerolls: list[int] | None = None,
+            dices: Dices,
     ) -> None:
-        '''Attempt to roll/reroll dices and update internals accordingly.'''
-        if rerolls is None:
-            rerolls = self.dices
-
+        '''Attempts to claim a roll result and updates internals accordingly.'''
         if self.rollsLeft == 0:
-            logger.error(f"Attempted roll (indexes: {rerolls}) while zero rolls were left in turn.")
+            logger.error("Attempted to claim roll result with 0 rolls left in turn.")
             return
-        
-        for i, reroll in enumerate(rerolls):
-            if reroll == 0:
-                continue
-            self.dices[i] -= reroll
-            
-        rollResult = random.choices([1,2,3,4,5,6], weights = dieWeights, k = sum(rerolls))
-        for e in rollResult:
-            self.dices[e] += 1
-            
+        self.dices = dices
 
     def getRerolls(self):
         '''Generator for possible rerolls.'''
@@ -148,7 +161,7 @@ class Game:
         return product(*ranges)
     
 
-    def claim(
+    def claimCategory(
             self,
             category: Category,
     ) -> int:
@@ -205,7 +218,7 @@ if __name__ == "__main__":
         game = Game()
         for dices,category,expectedScore in claims:
             game.dices = list(dices)
-            claimResult = game.claim(category)
+            claimResult = game.claimCategory(category)
             if claimResult != expectedScore:
                 print(f"Failed game claim score test case: Expected {expectedScore} but got {claimResult}.")
         if game.usedCategories != expectedUsed or game.upperSectionScore != expectedUpperSectionScore:
