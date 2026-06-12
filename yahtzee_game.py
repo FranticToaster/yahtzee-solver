@@ -64,6 +64,16 @@ class Game:
         hash_ += self.rollsLeft
         return hash_
 
+    def __eq__ (self, other) -> bool:
+        return(
+            isinstance(other, Game)
+            and self.turnsLeft == other.turnsLeft
+            and self.usedCategories == other.usedCategories
+            and self.upperSectionScore == other.upperSectionScore
+            and self.dices == other.dices
+            and self.rollsLeft == other.rollsLeft
+        )
+
     def copy(self):
         game = Game()
         game.turnsLeft = self.turnsLeft

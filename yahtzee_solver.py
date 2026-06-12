@@ -10,6 +10,7 @@ logging.basicConfig(
     filemode = "w",
     format = "%(asctime)s [%(levelname)s] %(filename)s: %(message)s",
     datefmt = "%Y-%m-%d %H:%M:%S",
+    level = logging.INFO,
 )
 
 #metrics
@@ -85,3 +86,4 @@ if __name__ == "__main__":
     logger.info(f"Searched {leaf_nodes_evaluated} leaf nodes and {total_nodes_evaluated} total nodes.")
     logger.info(f"Cache had a total of {len(cache)} entries.")
     logger.info(f"Took {end_time - start_time}s.")
+    logger.info(f"Best score found: {result}.")
