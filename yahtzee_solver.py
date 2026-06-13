@@ -1,5 +1,6 @@
 import logging
 import os
+from functools import cache
 from yahtzee_game import *
 from yahtzee_init import rollOutcomes, availableRerolls
 
@@ -19,8 +20,7 @@ leaf_nodes_evaluated = 0
 total_nodes_evaluated = 0
 
 
-cache: dict[Game, float] = {}
-
+@cache
 def dfs(
     game: Game,
 ) -> float:
@@ -30,11 +30,6 @@ def dfs(
     if game.turnsLeft == 0:
         leaf_nodes_evaluated += 1
         return 0
-    
-    cachedResult = cache.get(game, None)
-    if cachedResult is not None:
-        return cachedResult
-    
 
     # we handle this case first since we cannot claim immediately at the start of the turn, 
     # so in this case we will skip the claim best score calculation
@@ -44,7 +39,6 @@ def dfs(
             gameCopy = game.copy()
             gameCopy.claimRoll(dices)
             score += dfs(gameCopy) * probability
-        cache[game] = score
         return score
     
 
@@ -60,7 +54,6 @@ def dfs(
 
     if game.rollsLeft == 0:
         # if no rolls left we must claim a category
-        cache[game] = best_score
         return best_score
     
     else:
@@ -76,7 +69,6 @@ def dfs(
                 score += dfs(gameCopy) * probability
             best_score = max(best_score, score)
         
-        cache[game] = best_score
         return best_score
 
 
@@ -87,6 +79,6 @@ if __name__ == "__main__":
     result = dfs(game)
     end_time = perf_counter()
     logger.info(f"Searched {leaf_nodes_evaluated} leaf nodes and {total_nodes_evaluated} total nodes.")
-    logger.info(f"Cache had a total of {len(cache)} entries.")
+    logger.info(f"Cache info: {dfs.cache_info()}.")
     logger.info(f"Took {end_time - start_time}s.")
     logger.info(f"Best score found: {result}.")
