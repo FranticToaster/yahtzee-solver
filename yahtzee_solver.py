@@ -39,9 +39,6 @@ def dfs(
         leaf_nodes_evaluated += 1
         return 0
 
-    dicesValue = idxToDices[dicesIndex]
-    game = (turnsLeft, usedCategories, upperSectionScore, dicesValue, rollsLeft)
-
     # we handle this case first since we cannot claim immediately at the start of the turn, 
     # so in this case we will skip the claim best score calculation
     if rollsLeft == 3:
@@ -57,6 +54,8 @@ def dfs(
             score += dfs(*gameCopy) * probability
         return score
     
+    dicesValue = idxToDices[dicesIndex]
+    game = (turnsLeft, usedCategories, upperSectionScore, dicesValue, rollsLeft)
 
     # calculate claim first since we can choose to claim at any point in time 
     # as long as its not the start of the turn, which we already accounted for previously
@@ -106,14 +105,14 @@ if __name__ == "__main__":
     import io
     from time import perf_counter
 
-    profiling = True
+    profiling = False
 
     if profiling:
         profiler = cProfile.Profile()
         profiler.enable()
 
     start_time = perf_counter()
-    result = dfs(initGame())
+    result = dfs(*initGame())
     end_time = perf_counter()
 
     logger.info(f"Searched {leaf_nodes_evaluated} leaf nodes and {total_nodes_evaluated} total nodes (excluding cache).")

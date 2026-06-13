@@ -23,12 +23,13 @@ def precomputeRollOutcomes() -> list[list[tuple[Dices, float]]]:
             dices = [0] * 6
             for value in combination:
                 dices[value] += 1
+            dices = tuple(dices)
 
             #number of different permutations of the same combination
             permutations = factorials[i] // prod(factorials[e] for e in dices)
 
             probability = permutations * prod(dieWeights[value]/dieWeightsSum for value in combination)
-            row.append((tuple(dices),probability))
+            row.append((dices,probability))
         table.append(row)
 
     return table
@@ -39,12 +40,13 @@ def precomputeAvailableRerolls() -> dict[Dices, list[Dices]]:
         dices = [0] * 6
         for value in combination:
             dices[value] += 1
+        dices = tuple(dices)
         
         # ranges of possible reroll counts for each face.
         # e.g. if i have 3 '1's i can reroll 0, 1, 2 or 3 i.e. range(3 + 1) dices
         ranges = [range(dices[face] + 1) for face in range(6)]
         availableRerolls = tuple(product(*ranges))
-        table[tuple(dices)] = availableRerolls
+        table[dices] = availableRerolls
     return table
 
 #Dices to index and index to Dices
@@ -55,6 +57,7 @@ def precomputeDiceIndexes() -> tuple[dict[Dices, int], list[Dices]]:
         dices = [0] * 6
         for value in combination:
             dices[value] += 1
+        dices = tuple(dices)
         
         dicesToIdx[dices] = index
         idxToDices.append(dices)

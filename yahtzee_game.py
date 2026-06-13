@@ -15,12 +15,12 @@ DICES_INDEX = 3
 ROLLS_LEFT_INDEX = 4
 
 
-def initGame() -> Game:
+def initGame() -> GameWithDiceAsIndex:
     return (
-        1, #turnsLeft
+        13, #turnsLeft
         0, #usedCategories
         0, #upperSectionScore
-        (0,) * 6, #dices
+        252, #dices; 252 should raise index out of bounds if access is attempted
         3, #rollsLeft
     )
 
