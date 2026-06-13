@@ -188,7 +188,7 @@ if __name__ == "__main__":
             print(f"Failed category test case: {(category, dices)}: Expected {expected}.")
 
     for dices,expectedCount in rerollGeneratorTests:
-        rerollCount = len(availableRerolls[tuple(dices)]) #pyright: ignore[reportArgumentType]
+        rerollCount = len(availableRerolls[tuple(dices)])
         if rerollCount != expectedCount:
             print(f"Failed reroll test case: Expected {expectedCount} but got {rerollCount}.")
     

@@ -65,12 +65,14 @@ def dfs(
     
     else:
         #average score of rerolls
-        for reroll in availableRerolls:
+        for reroll in availableRerolls[tuple(game.dices)]:
             numRolled = sum(reroll)
             score = 0
+            remainingDices = [x - y for x,y in zip(game.dices, reroll)]
             for dices, probability in rollOutcomes[numRolled]:
                 gameCopy = game.copy()
-                gameCopy.claimRoll(dices)
+                newDices = [x + y for x,y in zip (remainingDices, dices)]
+                gameCopy.claimRoll(newDices)
                 score += dfs(gameCopy) * probability
             best_score = max(best_score, score)
         
