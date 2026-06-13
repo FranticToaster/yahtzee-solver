@@ -1,8 +1,5 @@
 import logging
 import os
-from functools import cache
-from yahtzee_game import *
-from yahtzee_init import rollOutcomes, availableRerolls
 
 DIR_PATH = os.path.dirname(os.path.abspath(__file__))
 
@@ -14,6 +11,12 @@ logging.basicConfig(
     datefmt = "%Y-%m-%d %H:%M:%S",
     level = logging.INFO,
 )
+
+from functools import cache
+from yahtzee_game import *
+from yahtzee_init import rollOutcomes, availableRerolls
+
+
 
 #metrics
 leaf_nodes_evaluated = 0
@@ -61,7 +64,15 @@ def dfs(
             score = 0
             remainingDices = [x - y for x,y in zip(game[DICES_INDEX], reroll)]
             for dices, probability in rollOutcomes[numRolled]:
-                newDices = tuple(x + y for x,y in zip (remainingDices, dices))
+                # ugly but around 2x faster
+                newDices = (
+                    remainingDices[0] + dices[0],
+                    remainingDices[1] + dices[1],
+                    remainingDices[2] + dices[2],
+                    remainingDices[3] + dices[3],
+                    remainingDices[4] + dices[4],
+                    remainingDices[5] + dices[5],
+                )
                 gameCopy = claimRoll(game, newDices)
                 score += dfs(gameCopy) * probability
             best_score = max(best_score, score)

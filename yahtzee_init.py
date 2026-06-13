@@ -1,4 +1,5 @@
 import logging
+from time import perf_counter
 from math import prod
 from itertools import product, combinations_with_replacement
 from yahtzee_locals import Dices
@@ -6,10 +7,12 @@ from yahtzee_config import dieWeights, dieWeightsSum
 
 
 logger = logging.getLogger(__name__)
+start_time = perf_counter()
 logger.info("Initialization started.")
 
 factorials = [1, 1, 2, 6, 24, 120, 720]
 
+#quite a bit of repetition but its precomputed so not a big deal
 def precomputeRollOutcomes() -> list[list[tuple[Dices, float]]]:
     table = []
 
@@ -30,7 +33,7 @@ def precomputeRollOutcomes() -> list[list[tuple[Dices, float]]]:
 
     return table
 
-def precomputeAvailableRerolls() -> dict[tuple[int, ...], list[Dices]]:
+def precomputeAvailableRerolls() -> dict[Dices, list[Dices]]:
     table = {}
     for combination in combinations_with_replacement(range(6), 5):
         dices = [0] * 6
@@ -44,7 +47,12 @@ def precomputeAvailableRerolls() -> dict[tuple[int, ...], list[Dices]]:
         table[tuple(dices)] = availableRerolls
     return table
 
+
 rollOutcomes = precomputeRollOutcomes()
 availableRerolls = precomputeAvailableRerolls()
 
 logger.info("Initialization complete.")
+time_taken = perf_counter() - start_time
+logger.info(f"Precomputation took a total of {time_taken}s.")
+if time_taken > 0.5:
+    logger.warning("Precomputation took more than 0.5s!")
