@@ -27,17 +27,16 @@ def dfs(
     global total_nodes_evaluated, leaf_nodes_evaluated
     total_nodes_evaluated += 1
 
-    if game.turnsLeft == 0:
+    if game[TURNS_LEFT_INDEX] == 0:
         leaf_nodes_evaluated += 1
         return 0
 
     # we handle this case first since we cannot claim immediately at the start of the turn, 
     # so in this case we will skip the claim best score calculation
-    if game.rollsLeft == 3:
+    if game[ROLLS_LEFT_INDEX] == 3:
         score = 0
         for dices, probability in rollOutcomes[5]:
-            gameCopy = game.copy()
-            gameCopy.claimRoll(dices)
+            gameCopy = claimRoll(game, dices)
             score += dfs(gameCopy) * probability
         return score
     
@@ -45,27 +44,25 @@ def dfs(
     # calculate claim first since we can choose to claim at any point in time 
     # as long as its not the start of the turn, which we already accounted for previously
     best_score = -1
-    for category in game.getLegalClaims():
-        gameCopy = game.copy()
-        claimedScore = gameCopy.claimCategory(category)
+    for category in getLegalClaims(game):
+        gameCopy, claimedScore = claimCategory(game, category)
         score = claimedScore + dfs(gameCopy)
         best_score = max(best_score, score)
 
 
-    if game.rollsLeft == 0:
+    if game[ROLLS_LEFT_INDEX] == 0:
         # if no rolls left we must claim a category
         return best_score
     
     else:
         #average score of rerolls
-        for reroll in availableRerolls[tuple(game.dices)]:
+        for reroll in availableRerolls[tuple(game[DICES_INDEX])]:
             numRolled = sum(reroll)
             score = 0
-            remainingDices = [x - y for x,y in zip(game.dices, reroll)]
+            remainingDices = [x - y for x,y in zip(game[DICES_INDEX], reroll)]
             for dices, probability in rollOutcomes[numRolled]:
-                gameCopy = game.copy()
-                newDices = [x + y for x,y in zip (remainingDices, dices)]
-                gameCopy.claimRoll(newDices)
+                newDices = tuple(x + y for x,y in zip (remainingDices, dices))
+                gameCopy = claimRoll(game, newDices)
                 score += dfs(gameCopy) * probability
             best_score = max(best_score, score)
         
@@ -85,7 +82,7 @@ if __name__ == "__main__":
         profiler.enable()
 
     start_time = perf_counter()
-    result = dfs(Game())
+    result = dfs(initGame())
     end_time = perf_counter()
 
     logger.info(f"Searched {leaf_nodes_evaluated} leaf nodes and {total_nodes_evaluated} total nodes (excluding cache).")

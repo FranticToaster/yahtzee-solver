@@ -4,7 +4,6 @@ from yahtzee_config import *
 
 logger = logging.getLogger(__name__)
 
-
 type Game = tuple[int, int, int, Dices, int]
 #access indexes
 TURNS_LEFT_INDEX = 0
@@ -19,7 +18,7 @@ def initGame() -> Game:
         13, #turnsLeft
         0, #usedCategories
         0, #upperSectionScore
-        [0,0,0,0,0,0], #dices
+        (0,) * 6, #dices
         3, #rollsLeft
     )
 
@@ -137,9 +136,9 @@ def claimCategory(
 
     usedCategories = game[USED_CATEGORIES_INDEX] | (1 << category)
     
-    turnsLeft = game[TURNS_LEFT_INDEX]
+    turnsLeft = game[TURNS_LEFT_INDEX] - 1
     #reset turn state
-    dices = [0] * 6
+    dices = (0,) * 6
     rollsLeft = 3
 
     newGame: Game = (
@@ -152,7 +151,7 @@ def claimCategory(
 
     return newGame, moveScore
 
-def getLegalClaims(game) -> list[int]:
+def getLegalClaims(game: Game) -> list[int]:
     '''Get a list of legal (possibly zero-score) claims via category indexes.'''
     categoriesAvailable = [i for i in range(ONES, YAHTZEE) if not ((game[USED_CATEGORIES_INDEX] >> i) & 1)]
     categoriesAvailable.append(YAHTZEE) #yahtzee can be scored multiple times
@@ -165,7 +164,7 @@ if __name__ == "__main__":
     
     game = initGame()
     for dices,category,expected in categoryTests:
-        if moveFitsReq(globals()[category.upper()], list(dices)) != expected:
+        if moveFitsReq(globals()[category.upper()], dices) != expected:
             print(f"Failed category test case: {(category, dices)}: Expected {expected}.")
 
     for dices,expectedCount in rerollGeneratorTests:
@@ -176,7 +175,7 @@ if __name__ == "__main__":
     for claims,expectedUsed,expectedUpperSectionScore in gameTests:
         game = initGame()
         for dices,category,expectedScore in claims:
-            game = (*game[:3], list(dices), game[4])
+            game = (*game[:3], dices, game[4])
             game, claimResult = claimCategory(game, category)
             if claimResult != expectedScore:
                 print(f"Failed game claim score test case: Expected {expectedScore} but got {claimResult}.")

@@ -15,4 +15,4 @@ FULL_HOUSE: Category = 10
 CHANCE: Category = 11
 YAHTZEE: Category = 12
 
-type Dices = list[int]
+type Dices = tuple[int, ...]

@@ -25,7 +25,7 @@ def precomputeRollOutcomes() -> list[list[tuple[Dices, float]]]:
             permutations = factorials[i] // prod(factorials[e] for e in dices)
 
             probability = permutations * prod(dieWeights[value]/dieWeightsSum for value in combination)
-            row.append((dices,probability))
+            row.append((tuple(dices),probability))
         table.append(row)
 
     return table
