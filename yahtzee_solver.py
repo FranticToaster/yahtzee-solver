@@ -73,12 +73,30 @@ def dfs(
 
 
 if __name__ == "__main__":
+    import cProfile
+    import pstats
+    import io
     from time import perf_counter
-    game = Game()
+
+    profiling = False
+
+    if profiling:
+        profiler = cProfile.Profile()
+        profiler.enable()
+
     start_time = perf_counter()
-    result = dfs(game)
+    result = dfs(Game())
     end_time = perf_counter()
-    logger.info(f"Searched {leaf_nodes_evaluated} leaf nodes and {total_nodes_evaluated} total nodes.")
+
+    logger.info(f"Searched {leaf_nodes_evaluated} leaf nodes and {total_nodes_evaluated} total nodes (excluding cache).")
     logger.info(f"Cache info: {dfs.cache_info()}.")
     logger.info(f"Took {end_time - start_time}s.")
     logger.info(f"Best score found: {result}.")
+
+    if profiling:
+        profiler.disable() #pyright: ignore[reportPossiblyUnboundVariable]
+        stream = io.StringIO()
+        stats = pstats.Stats(profiler, stream = stream) #pyright: ignore[reportPossiblyUnboundVariable]
+        stats.strip_dirs().sort_stats(pstats.SortKey.TIME).print_stats()
+
+        logger.info(f"\n{stream.getvalue()}")
