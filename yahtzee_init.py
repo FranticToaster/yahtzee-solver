@@ -47,9 +47,24 @@ def precomputeAvailableRerolls() -> dict[Dices, list[Dices]]:
         table[tuple(dices)] = availableRerolls
     return table
 
+#Dices to index and index to Dices
+def precomputeDiceIndexes() -> tuple[dict[Dices, int], list[Dices]]:
+    dicesToIdx = {}
+    idxToDices = []
+    for index, combination in zip(range(252), combinations_with_replacement(range(6), 5)):
+        dices = [0] * 6
+        for value in combination:
+            dices[value] += 1
+        
+        dicesToIdx[dices] = index
+        idxToDices.append(dices)
+    return dicesToIdx, idxToDices
+
 
 rollOutcomes = precomputeRollOutcomes()
 availableRerolls = precomputeAvailableRerolls()
+dicesToIdx, idxToDices = precomputeDiceIndexes()
+
 
 logger.info("Initialization complete.")
 time_taken = perf_counter() - start_time

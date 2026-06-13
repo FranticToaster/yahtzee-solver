@@ -1,10 +1,12 @@
 import logging
 from yahtzee_locals import *
 from yahtzee_config import *
+from yahtzee_init import *
 
 logger = logging.getLogger(__name__)
 
 type Game = tuple[int, int, int, Dices, int]
+type GameWithDiceAsIndex = tuple[int, int, int, int, int] #dices represented as index
 #access indexes
 TURNS_LEFT_INDEX = 0
 USED_CATEGORIES_INDEX = 1
@@ -15,7 +17,7 @@ ROLLS_LEFT_INDEX = 4
 
 def initGame() -> Game:
     return (
-        13, #turnsLeft
+        1, #turnsLeft
         0, #usedCategories
         0, #upperSectionScore
         (0,) * 6, #dices
@@ -90,40 +92,12 @@ def getMoveScore(
         return sum(count * (i+1) for i,count in enumerate(game[DICES_INDEX]))
         
 
-def claimRoll(
-        game: Game,
-        dices: Dices,
-) -> Game:
-    '''Attempts to claim a roll result and updates internals accordingly.'''
-    if game[ROLLS_LEFT_INDEX] == 0:
-        logger.error("Attempted to claim roll result with 0 rolls left in turn.")
-        return game
-    
-    return (
-        game[0],
-        game[1],
-        game[2],
-        dices,
-        game[ROLLS_LEFT_INDEX] - 1,
-    )
-
 
 def claimCategory(
         game: Game,
         category: Category,
-) -> tuple[Game, int]:
-    '''Attempt to claim a category and update internals accordingly. Returns score of claim or 0 if an error occurs.'''
-    if not (ONES <= category <= YAHTZEE):
-        logger.error(f"Invalid category index: {category}!")
-        return game, 0
-
-    if (
-        category != YAHTZEE
-        and ((game[USED_CATEGORIES_INDEX] >> category) & 1)
-    ):
-        logger.error(f"Category {category} has already been used! Used categories bitmask: {game[USED_CATEGORIES_INDEX]}.")
-        return game, 0
-
+) -> tuple[GameWithDiceAsIndex, int]:
+    '''Claim category and update internals. Does not check for validity.'''
     upperSectionScore = game[UPPER_SECTION_SCORE_INDEX]
 
     moveScore = getMoveScore(game, category, game[DICES_INDEX])
@@ -138,14 +112,14 @@ def claimCategory(
     
     turnsLeft = game[TURNS_LEFT_INDEX] - 1
     #reset turn state
-    dices = (0,) * 6
+    dicesIndex = 252 #252 should raise index out of bounds if access is attempted
     rollsLeft = 3
 
-    newGame: Game = (
+    newGame: GameWithDiceAsIndex = (
         turnsLeft,
         usedCategories,
         upperSectionScore,
-        dices,
+        dicesIndex,
         rollsLeft,
     )
 
