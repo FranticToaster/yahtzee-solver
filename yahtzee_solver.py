@@ -1,6 +1,7 @@
 import logging
 import os
 from yahtzee_game import *
+from yahtzee_init import rollOutcomes, availableRerolls
 
 DIR_PATH = os.path.dirname(os.path.abspath(__file__))
 
@@ -18,11 +19,11 @@ leaf_nodes_evaluated = 0
 total_nodes_evaluated = 0
 
 
-cache: dict[Game, int] = {}
+cache: dict[Game, float] = {}
 
 def dfs(
     game: Game,
-) -> int:
+) -> float:
     global total_nodes_evaluated, leaf_nodes_evaluated
     total_nodes_evaluated += 1
 
@@ -39,7 +40,7 @@ def dfs(
     # so in this case we will skip the claim best score calculation
     if game.rollsLeft == 3:
         score = 0
-        for dices, probability in Game.rollOutcomes[5]:
+        for dices, probability in rollOutcomes[5]:
             gameCopy = game.copy()
             gameCopy.claimRoll(dices)
             score += dfs(gameCopy) * probability
@@ -64,10 +65,10 @@ def dfs(
     
     else:
         #average score of rerolls
-        for reroll in game.getRerolls():
+        for reroll in availableRerolls:
             numRolled = sum(reroll)
             score = 0
-            for dices, probability in Game.rollOutcomes[numRolled]:
+            for dices, probability in rollOutcomes[numRolled]:
                 gameCopy = game.copy()
                 gameCopy.claimRoll(dices)
                 score += dfs(gameCopy) * probability

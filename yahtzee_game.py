@@ -1,39 +1,12 @@
 import logging
-from math import prod
-from itertools import product, combinations_with_replacement
 from yahtzee_locals import *
 from yahtzee_config import *
 
 logger = logging.getLogger(__name__)
 
 
-factorials = [1, 1, 2, 6, 24, 120, 720]
-
-
-def precomputeRollOutcomes() -> list[list[tuple[Dices, int]]]:
-    table = []
-
-    for i in range(6):
-        row = []
-        for combination in combinations_with_replacement(range(6), i):
-            #convert to Dices format (counts of each value)
-            dices = [0] * 6
-            for value in combination:
-                dices[value] += 1
-
-            #number of different permutations of the same combination
-            permutations = factorials[i] / prod(factorials[e] for e in dices)
-
-            probability = permutations * prod(dieWeights[value]/dieWeightsSum for value in combination)
-            row.append((dices,probability))
-        table.append(row)
-
-    return table
-
 #pretty messy but not much time is available to clean up code
 class Game:
-    #idk why i made this a class attribute instead of global var
-    rollOutcomes = precomputeRollOutcomes()
     def __init__(
             self,
             *_,
@@ -165,14 +138,6 @@ class Game:
         self.dices = dices
         self.rollsLeft -= 1
 
-    def getRerolls(self):
-        '''Generator for possible rerolls.'''
-        # ranges of possible reroll counts for each face.
-        # e.g. if i have 3 '1's i can reroll 0, 1, 2 or 3 i.e. range(3 + 1) dices
-        ranges = [range(self.dices[face] + 1) for face in range(6)]
-        return product(*ranges)
-    
-
     def claimCategory(
             self,
             category: Category,
@@ -214,15 +179,16 @@ class Game:
     
     
 if __name__ == "__main__":
+    from yahtzee_init import availableRerolls
     from yahtzee_tests import *
+    
     game = Game()
     for dices,category,expected in categoryTests:
         if game.moveFitsReq(globals()[category.upper()], list(dices)) != expected:
             print(f"Failed category test case: {(category, dices)}: Expected {expected}.")
 
     for dices,expectedCount in rerollGeneratorTests:
-        game.dices = list(dices)
-        rerollCount = len(list(game.getRerolls()))
+        rerollCount = len(availableRerolls[tuple(dices)]) #pyright: ignore[reportArgumentType]
         if rerollCount != expectedCount:
             print(f"Failed reroll test case: Expected {expectedCount} but got {rerollCount}.")
     
