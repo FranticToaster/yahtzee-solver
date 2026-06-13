@@ -97,6 +97,6 @@ if __name__ == "__main__":
         profiler.disable() #pyright: ignore[reportPossiblyUnboundVariable]
         stream = io.StringIO()
         stats = pstats.Stats(profiler, stream = stream) #pyright: ignore[reportPossiblyUnboundVariable]
-        stats.strip_dirs().sort_stats(pstats.SortKey.TIME).print_stats()
+        stats.strip_dirs().sort_stats(pstats.SortKey.TIME).print_stats(10)
 
         logger.info(f"\n{stream.getvalue()}")
