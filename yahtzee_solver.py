@@ -52,7 +52,7 @@ def dfs(
                 usedCategories,
                 upperSectionScore,
                 rollResultIdx,
-                rollsLeft - 1
+                2 #rollsLeft - 1 == 2 when rollsLeft == 3
             )
         return score
     
@@ -75,6 +75,7 @@ def dfs(
         return best_score
     
     else:
+        rollsLeftMinusOne = rollsLeft - 1
         #average score of rerolls
         for reroll in availableRerolls[dicesValue]:
             rerollOutcomes = rollOutcomesByIdx[sum(reroll)]
@@ -87,7 +88,7 @@ def dfs(
                     usedCategories,
                     upperSectionScore,
                     dicesAdditionByIdx[remainingDicesIdx][rollResultIdx],
-                    rollsLeft - 1,
+                    rollsLeftMinusOne,
                 )
             
 
