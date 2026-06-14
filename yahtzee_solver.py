@@ -47,14 +47,13 @@ def dfs(
     if rollsLeft == 3:
         score = 0
         for rollResultIdx, probability in rollOutcomesByIdx[5]:
-            gameCopy = (
+            score += probability * dfs(
                 turnsLeft,
                 usedCategories,
                 upperSectionScore,
                 rollResultIdx,
                 rollsLeft - 1
             )
-            score += dfs(*gameCopy) * probability
         return score
     
     dicesValue = idxToDices[dicesIndex]
@@ -62,11 +61,13 @@ def dfs(
 
     # calculate claim first since we can choose to claim at any point in time 
     # as long as its not the start of the turn, which we already accounted for previously
-    best_score = -1
+    best_score = -1.0
     for category in getLegalClaims(game):
         gameCopy, claimedScore = claimCategory(game, category)
         score = claimedScore + dfs(*gameCopy)
-        best_score = max(best_score, score)
+
+        if score > best_score:
+            best_score = score
 
 
     if rollsLeft == 0:
@@ -78,19 +79,20 @@ def dfs(
         for reroll in availableRerolls[dicesValue]:
             rerollOutcomes = rollOutcomesByIdx[sum(reroll)]
             remainingDicesIdx = dicesToIdx[tuple(x - y for x,y in zip(dicesValue, reroll))]
-            score = 0
 
+            score = 0.0
             for rollResultIdx, probability in rerollOutcomes:
-                newDicesIdx = dicesAdditionByIdx[remainingDicesIdx][rollResultIdx]
-                gameCopy = (
+                score += probability * dfs(
                     turnsLeft,
                     usedCategories,
                     upperSectionScore,
-                    newDicesIdx,
+                    dicesAdditionByIdx[remainingDicesIdx][rollResultIdx],
                     rollsLeft - 1,
                 )
-                score += dfs(*gameCopy) * probability
-            best_score = max(best_score, score)
+            
+
+            if score > best_score:
+                best_score = score
         
         return best_score
 
