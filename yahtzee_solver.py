@@ -46,12 +46,12 @@ def dfs(
     # so in this case we will skip the claim best score calculation
     if rollsLeft == 3:
         score = 0
-        for rollResult, probability in rollOutcomes[5]:
+        for rollResultIdx, probability in rollOutcomesByIdx[5]:
             gameCopy = (
                 turnsLeft,
                 usedCategories,
                 upperSectionScore,
-                dicesToIdx[rollResult],
+                rollResultIdx,
                 rollsLeft - 1
             )
             score += dfs(*gameCopy) * probability
@@ -75,25 +75,18 @@ def dfs(
     
     else:
         #average score of rerolls
-        for reroll in availableRerolls[tuple(game[DICES_INDEX])]:
-            numRolled = sum(reroll)
+        for reroll in availableRerolls[dicesValue]:
+            rerollOutcomes = rollOutcomesByIdx[sum(reroll)]
+            remainingDicesIdx = dicesToIdx[tuple(x - y for x,y in zip(dicesValue, reroll))]
             score = 0
-            remainingDices = [x - y for x,y in zip(game[DICES_INDEX], reroll)]
-            for rollResult, probability in rollOutcomes[numRolled]:
-                # ugly but around 2x faster
-                newDices = (
-                    remainingDices[0] + rollResult[0],
-                    remainingDices[1] + rollResult[1],
-                    remainingDices[2] + rollResult[2],
-                    remainingDices[3] + rollResult[3],
-                    remainingDices[4] + rollResult[4],
-                    remainingDices[5] + rollResult[5],
-                )
+
+            for rollResultIdx, probability in rerollOutcomes:
+                newDicesIdx = dicesAdditionByIdx[remainingDicesIdx][rollResultIdx]
                 gameCopy = (
                     turnsLeft,
                     usedCategories,
                     upperSectionScore,
-                    dicesToIdx[newDices],
+                    newDicesIdx,
                     rollsLeft - 1,
                 )
                 score += dfs(*gameCopy) * probability

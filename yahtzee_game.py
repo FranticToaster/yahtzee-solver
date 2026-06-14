@@ -20,7 +20,7 @@ def initGame() -> GameWithDiceAsIndex:
         13, #turnsLeft
         0, #usedCategories
         0, #upperSectionScore
-        252, #dices; 252 should raise index out of bounds if access is attempted
+        999, #dices; 999 should raise index out of bounds if access is attempted
         3, #rollsLeft
     )
 
@@ -112,7 +112,7 @@ def claimCategory(
     
     turnsLeft = game[TURNS_LEFT_INDEX] - 1
     #reset turn state
-    dicesIndex = 252 #252 should raise index out of bounds if access is attempted
+    dicesIndex = 999 #999 should raise index out of bounds if access is attempted
     rollsLeft = 3
 
     newGame: GameWithDiceAsIndex = (
