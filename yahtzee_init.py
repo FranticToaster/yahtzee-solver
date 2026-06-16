@@ -1,9 +1,9 @@
 __all__ = [
-    ＂dicesToIdx＂,
-    ＂idxToDices＂,
-    ＂rollOutcomesByIdx＂,
-    ＂availableRerolls＂,
-    ＂dicesAdditionByIdx＂,
+    "dicesToIdx",
+    "idxToDices",
+    "rollOutcomesByIdx",
+    "availableRerolls",
+    "dicesAdditionByIdx",
 ]
 
 import logging
