@@ -47,8 +47,8 @@ def _precomputeRollOutcomesByIdx(idxToDices) -> list[list[tuple[int, float]]]:
     for dicesIdx, dices in enumerate(idxToDices):
         #number of different permutations of the same combination
         permutations = factorials[i] // prod(factorials[e] for e in dices)
-        probability = permutations * prod(dieWeights[value]/dieWeightsSum for value in combination)
-        table[5 - sum(dices)].append((dicesIdx,probability))
+        probability = permutations * prod(dieWeights[value] / dieWeightsSum for value in combination)
+        table[sum(dices)].append((dicesIdx, probability))
 
     return table
 
