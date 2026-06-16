@@ -18,28 +18,37 @@ _logger = logging.getLogger(__name__)
 _start_time = perf_counter()
 _logger.info("Initialization started.")
 
-_factorials = [1, 1, 2, 6, 24, 120, 720]
 
 #quite a bit of repetition but its precomputed so not a big deal
-def _precomputeRollOutcomesByIdx(dicesToIdx) -> list[list[tuple[int, float]]]:
-    table = []
 
-    for i in range(6):
-        row = []
+
+def _precomputeDiceIndexes() -> tuple[dict[Dices, int], list[Dices]]:
+    dicesToIdx = {}
+    idxToDices = []
+    index = 0
+    for i in range(5, -1, -1):
         for combination in combinations_with_replacement(range(6), i):
-            #convert to Dices format (counts of each value)
             dices = [0] * 6
             for value in combination:
                 dices[value] += 1
             dices = tuple(dices)
-            dicesIdx = dicesToIdx[dices]
+            
+            dicesToIdx[dices] = index
+            idxToDices.append(dices)
+            index += 1
+            
+    return dicesToIdx, idxToDices
 
-            #number of different permutations of the same combination
-            permutations = _factorials[i] // prod(_factorials[e] for e in dices)
 
-            probability = permutations * prod(dieWeights[value]/dieWeightsSum for value in combination)
-            row.append((dicesIdx,probability))
-        table.append(row)
+def _precomputeRollOutcomesByIdx(idxToDices) -> list[list[tuple[int, float]]]:
+    table = [[] for _ in range(6)]
+    factorials = [1, 1, 2, 6, 24, 120, 720]
+
+    for dicesIdx, dices in enumerate(idxToDices):
+        #number of different permutations of the same combination
+        permutations = factorials[i] // prod(factorials[e] for e in dices)
+        probability = permutations * prod(dieWeights[value]/dieWeightsSum for value in combination)
+        table[5 - sum(dices)].append((dicesIdx,probability))
 
     return table
 
@@ -60,27 +69,7 @@ def _precomputeAvailableRerolls() -> dict[Dices, list[Dices]]:
     return table
 
 
-
-def _precomputeDiceIndexes() -> tuple[dict[Dices, int], list[Dices]]:
-    dicesToIdx = {}
-    idxToDices = []
-    index = 0
-    for i in range(6):
-        for combination in combinations_with_replacement(range(6), i):
-            dices = [0] * 6
-            for value in combination:
-                dices[value] += 1
-            dices = tuple(dices)
-            
-            dicesToIdx[dices] = index
-            idxToDices.append(dices)
-            index += 1
-            
-    return dicesToIdx, idxToDices
-
-
-
-def _precomputeDicesAdditionByIdx(dicesToIdx,idxToDices) -> list[list[int]]:
+def _precomputeDicesAdditionByIdx(dicesToIdx, idxToDices) -> list[list[int]]:
     table = []
     for i in range(462):
         row = []
@@ -100,7 +89,7 @@ def _precomputeDicesAdditionByIdx(dicesToIdx,idxToDices) -> list[list[int]]:
     
 
 dicesToIdx, idxToDices = _precomputeDiceIndexes()
-rollOutcomesByIdx = _precomputeRollOutcomesByIdx(dicesToIdx)
+rollOutcomesByIdx = _precomputeRollOutcomesByIdx(idxToDices)
 availableRerolls = _precomputeAvailableRerolls()
 dicesAdditionByIdx = _precomputeDicesAdditionByIdx(dicesToIdx, idxToDices)
 
