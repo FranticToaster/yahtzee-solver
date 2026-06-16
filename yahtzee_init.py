@@ -6,14 +6,14 @@ from yahtzee_locals import Dices
 from yahtzee_config import dieWeights, dieWeightsSum
 
 
-logger = logging.getLogger(__name__)
-start_time = perf_counter()
-logger.info("Initialization started.")
+_logger = logging.getLogger(__name__)
+_start_time = perf_counter()
+_logger.info("Initialization started.")
 
-factorials = [1, 1, 2, 6, 24, 120, 720]
+_factorials = [1, 1, 2, 6, 24, 120, 720]
 
 #quite a bit of repetition but its precomputed so not a big deal
-def precomputeRollOutcomesByIdx(dicesToIdx) -> list[list[tuple[int, float]]]:
+def _precomputeRollOutcomesByIdx(dicesToIdx) -> list[list[tuple[int, float]]]:
     table = []
 
     for i in range(6):
@@ -27,7 +27,7 @@ def precomputeRollOutcomesByIdx(dicesToIdx) -> list[list[tuple[int, float]]]:
             dicesIdx = dicesToIdx[dices]
 
             #number of different permutations of the same combination
-            permutations = factorials[i] // prod(factorials[e] for e in dices)
+            permutations = _factorials[i] // prod(_factorials[e] for e in dices)
 
             probability = permutations * prod(dieWeights[value]/dieWeightsSum for value in combination)
             row.append((dicesIdx,probability))
@@ -36,7 +36,7 @@ def precomputeRollOutcomesByIdx(dicesToIdx) -> list[list[tuple[int, float]]]:
     return table
 
 
-def precomputeAvailableRerolls() -> dict[Dices, list[Dices]]:
+def _precomputeAvailableRerolls() -> dict[Dices, list[Dices]]:
     table = {}
     for combination in combinations_with_replacement(range(6), 5):
         dices = [0] * 6
@@ -53,7 +53,7 @@ def precomputeAvailableRerolls() -> dict[Dices, list[Dices]]:
 
 
 
-def precomputeDiceIndexes() -> tuple[dict[Dices, int], list[Dices]]:
+def _precomputeDiceIndexes() -> tuple[dict[Dices, int], list[Dices]]:
     dicesToIdx = {}
     idxToDices = []
     index = 0
@@ -72,7 +72,7 @@ def precomputeDiceIndexes() -> tuple[dict[Dices, int], list[Dices]]:
 
 
 
-def precomputeDicesAdditionByIdx(dicesToIdx,idxToDices) -> list[list[int]]:
+def _precomputeDicesAdditionByIdx(dicesToIdx,idxToDices) -> list[list[int]]:
     table = []
     for i in range(462):
         row = []
@@ -91,16 +91,16 @@ def precomputeDicesAdditionByIdx(dicesToIdx,idxToDices) -> list[list[int]]:
     return table
     
 
-dicesToIdx, idxToDices = precomputeDiceIndexes()
-rollOutcomesByIdx = precomputeRollOutcomesByIdx(dicesToIdx)
-availableRerolls = precomputeAvailableRerolls()
-dicesAdditionByIdx = precomputeDicesAdditionByIdx(dicesToIdx, idxToDices)
+dicesToIdx, idxToDices = _precomputeDiceIndexes()
+rollOutcomesByIdx = _precomputeRollOutcomesByIdx(dicesToIdx)
+availableRerolls = _precomputeAvailableRerolls()
+dicesAdditionByIdx = _precomputeDicesAdditionByIdx(dicesToIdx, idxToDices)
 
 
 
 
-logger.info("Initialization complete.")
-time_taken = perf_counter() - start_time
-logger.info(f"Precomputation took a total of {time_taken}s.")
-if time_taken > 5:
-    logger.warning("Precomputation took more than 5s!")
+_logger.info("Initialization complete.")
+_time_taken = perf_counter() - _start_time
+_logger.info(f"Precomputation took a total of {_time_taken}s.")
+if_time_taken > 5:
+    _logger.warning("Precomputation took more than 5s!")
