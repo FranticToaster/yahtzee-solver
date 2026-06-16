@@ -27,20 +27,21 @@ total_nodes_evaluated = 0
 @cache
 #idk how to make this conditional so just comment it out for now
 #@line_profiler.profile
-# use separate args instead of packing into Game obj for better caching
-def dfs(
-    turnsLeft: int,
-    usedCategories: int,
-    upperSectionScore: int,
-    dicesIndex: int,
-    rollsLeft: int,
-) -> float:
+# use gameInt (bitpacked) instead of separate args for faster caching
+#TODO: ensure sum=5 dice combinations fit within 256
+def dfs(gameInt: int) -> float:
     global total_nodes_evaluated, leaf_nodes_evaluated
     total_nodes_evaluated += 1
+    
+    turnsLeft = (gameInt >> 2) & 0b1111
 
     if turnsLeft == 0:
         leaf_nodes_evaluated += 1
         return 0
+    
+    usedCategories = (gameInt >> 20)
+    upperSectionScore = (gameInt >> 6) & 0b111111
+    rollsLeft = gameInt & 0b11
 
     # we handle this case first since we cannot claim immediately at the start of the turn, 
     # so in this case we will skip the claim best score calculation
@@ -56,6 +57,7 @@ def dfs(
             )
         return score
     
+    dicesIndex = (gameInt >> 12) & 0b11111111
     dicesValue = idxToDices[dicesIndex]
     game = (turnsLeft, usedCategories, upperSectionScore, dicesValue, rollsLeft)
 
