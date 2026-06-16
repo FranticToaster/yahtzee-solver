@@ -1,3 +1,11 @@
+__all__ = [
+    ＂dicesToIdx＂,
+    ＂idxToDices＂,
+    ＂rollOutcomesByIdx＂,
+    ＂availableRerolls＂,
+    ＂dicesAdditionByIdx＂,
+]
+
 import logging
 from time import perf_counter
 from math import prod
@@ -102,5 +110,5 @@ dicesAdditionByIdx = _precomputeDicesAdditionByIdx(dicesToIdx, idxToDices)
 _logger.info("Initialization complete.")
 _time_taken = perf_counter() - _start_time
 _logger.info(f"Precomputation took a total of {_time_taken}s.")
-if_time_taken > 5:
+if _time_taken > 5:
     _logger.warning("Precomputation took more than 5s!")
