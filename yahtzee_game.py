@@ -17,11 +17,11 @@ ROLLS_LEFT_INDEX = 4
 
 def initGame() -> GameWithDiceAsIndex:
     return (
-        13, #turnsLeft
-        0, #usedCategories
-        0, #upperSectionScore
-        999, #dices; 999 should raise index out of bounds if access is attempted
-        3, #rollsLeft
+        (13 << 2) #turnsLeft
+        | (0 << 20) #usedCategories
+        | (0 << 6) #upperSectionScore
+        | (255 << 12) #dices; 256 should raise index out of bounds if access is attempted
+        | 3, #rollsLeft
     )
 
 
@@ -112,7 +112,7 @@ def claimCategory(
     
     turnsLeft = game[TURNS_LEFT_INDEX] - 1
     #reset turn state
-    dicesIndex = 999 #999 should raise index out of bounds if access is attempted
+    dicesIndex = 255 #255 should raise index out of bounds if access is attempted
     rollsLeft = 3
 
     newGame: GameWithDiceAsIndex = (
