@@ -29,7 +29,7 @@ total_nodes_evaluated = 0
 #@line_profiler.profile
 # use gameInt (bitpacked) instead of separate args for faster caching
 #TODO: ensure sum=5 dice combinations fit within 256
-def dfs(gameInt: int) -> float:
+def dfs(gameInt: gameAsInt) -> float:
     global total_nodes_evaluated, leaf_nodes_evaluated
     total_nodes_evaluated += 1
     
@@ -66,7 +66,13 @@ def dfs(gameInt: int) -> float:
     best_score = -1.0
     for category in getLegalClaims(game):
         gameCopy, claimedScore = claimCategory(game, category)
-        score = claimedScore + dfs(*gameCopy)
+        score = claimedScore + dfs(
+            (gameCopy[0] << 2)
+            | (gameCopy[1] << 20)
+            | (gameCopy[2] << 6)
+            | (gameCopy[3] << 12)
+            | gameCopy[4]
+        )
 
         if score > best_score:
             best_score = score
@@ -86,11 +92,11 @@ def dfs(gameInt: int) -> float:
             score = 0.0
             for rollResultIdx, probability in rerollOutcomes:
                 score += probability * dfs(
-                    turnsLeft,
-                    usedCategories,
-                    upperSectionScore,
-                    dicesAdditionByIdx[remainingDicesIdx][rollResultIdx],
-                    rollsLeftMinusOne,
+                    (turnsLeft << 2)
+                    | (usedCategories << 20)
+                    | (upperSectionScore << 6)
+                    | (dicesAdditionByIdx[remainingDicesIdx][rollResultIdx] << 12)
+                    | rollsLeftMinusOne
                 )
             
 
