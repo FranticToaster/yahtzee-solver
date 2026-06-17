@@ -110,7 +110,7 @@ if __name__ == "__main__":
     from time import perf_counter
 
     start_time = perf_counter()
-    result = dfs(*initGame())
+    result = dfs(initGame())
     end_time = perf_counter()
 
     logger.info(f"Searched {leaf_nodes_evaluated} leaf nodes and {total_nodes_evaluated} total nodes (excluding cache).")
