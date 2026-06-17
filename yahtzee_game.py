@@ -6,6 +6,7 @@ from yahtzee_init import *
 logger = logging.getLogger(__name__)
 
 type Game = tuple[int, int, int, Dices, int]
+type GameAsInt = int
 type GameWithDiceAsIndex = tuple[int, int, int, int, int] #dices represented as index
 #access indexes
 TURNS_LEFT_INDEX = 0
@@ -15,7 +16,7 @@ DICES_INDEX = 3
 ROLLS_LEFT_INDEX = 4
 
 
-def initGame() -> GameWithDiceAsIndex:
+def initGame() -> GameAsInt:
     return (
         (13 << 2) #turnsLeft
         | (0 << 20) #usedCategories
@@ -131,7 +132,8 @@ def getLegalClaims(game: Game) -> list[int]:
     categoriesAvailable.append(YAHTZEE) #yahtzee can be scored multiple times
     return categoriesAvailable
     
-    
+
+#tests are broken for now
 if __name__ == "__main__":
     from yahtzee_init import availableRerolls
     from yahtzee_tests import *
