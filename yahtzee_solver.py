@@ -49,11 +49,11 @@ def dfs(gameInt: int) -> float:
         score = 0
         for rollResultIdx, probability in rollOutcomesByIdx[5]:
             score += probability * dfs(
-                turnsLeft,
-                usedCategories,
-                upperSectionScore,
-                rollResultIdx,
-                2 #rollsLeft - 1 == 2 when rollsLeft == 3
+                (turnsLeft << 2)
+                | (usedCategories << 20)
+                | (upperSectionScore << 6)
+                | (rollResultIdx << 12)
+                | 2 #rollsLeft - 1 == 2 when rollsLeft == 3
             )
         return score
     
