@@ -41,6 +41,7 @@ def _precomputeDiceIndexes() -> tuple[dict[Dices, int], list[Dices]]:
 
 
 def _precomputeRollOutcomesByIdx(dicesToIdx) -> list[list[tuple[int, float]]]:
+    factorials = (1, 1, 2, 6, 24, 120, 720)
     table = []
 
     for i in range(6):
@@ -54,9 +55,9 @@ def _precomputeRollOutcomesByIdx(dicesToIdx) -> list[list[tuple[int, float]]]:
             dicesIdx = dicesToIdx[dices]
 
             #number of different permutations of the same combination
-            permutations = _factorials[i] // prod(_factorials[e] for e in dices)
+            permutations = factorials[i] // prod(factorials[e] for e in dices)
 
-            probability = permutations * prod(dieWeights[value]/dieWeightsSum for value in combination)
+            probability = permutations * prod(dieWeights[value] / dieWeightsSum for value in combination)
             row.append((dicesIdx,probability))
         table.append(row)
 
@@ -100,7 +101,7 @@ def _precomputeDicesAdditionByIdx(dicesToIdx, idxToDices) -> list[list[int]]:
     
 
 dicesToIdx, idxToDices = _precomputeDiceIndexes()
-rollOutcomesByIdx = _precomputeRollOutcomesByIdx(idxToDices)
+rollOutcomesByIdx = _precomputeRollOutcomesByIdx(dicesToIdx)
 availableRerolls = _precomputeAvailableRerolls()
 dicesAdditionByIdx = _precomputeDicesAdditionByIdx(dicesToIdx, idxToDices)
 
