@@ -23,8 +23,8 @@ def initGame() -> GameAsInt:
         (13 << 2) #turnsLeft
         | (0 << 20) #usedCategories
         | (0 << 6) #upperSectionScore
-        | (255 << 12) #dices; 256 should raise index out of bounds if access is attempted
-        | 3, #rollsLeft
+        | (255 << 12) #dices; 255 should raise index out of bounds if access is attempted
+        | 3 #rollsLeft
     )
 
 
@@ -87,12 +87,12 @@ def getMoveScore(
     elif category == YAHTZEE:
         return (
             100
-            if yahtzeeBonus and (game[USED_CATEGORIES_INDEX] >> category) & 1
+            if yahtzeeBonus and (game >> (20 + category)) & 1
             else 50
         )
 
     else:
-        return sum(count * (i+1) for i,count in enumerate(game[DICES_INDEX]))
+        return sum(count * (i+1) for i,count in enumerate(idxToDices[(game >> 12) & 0b11111111]))
         
 
 
@@ -101,19 +101,19 @@ def claimCategory(
         category: Category,
 ) -> tuple[GameWithDiceAsIndex, int]:
     '''Claim category and update internals. Does not check for validity.'''
-    upperSectionScore = game[UPPER_SECTION_SCORE_INDEX]
+    upperSectionScore = (game >> 6) & 0b111111
 
-    moveScore = getMoveScore(game, category, game[DICES_INDEX])
-    if category <= SIXES and game[UPPER_SECTION_SCORE_INDEX] < 63:
+    moveScore = getMoveScore(game, category, (game >> 12) & 0b11111111)
+    if category <= SIXES and upperSectionScore < 63:
         upperSectionScore = max(
             63,
             upperSectionScore + moveScore
         )
     
 
-    usedCategories = game[USED_CATEGORIES_INDEX] | (1 << category)
+    usedCategories = (game >> 20) | (1 << category)
     
-    turnsLeft = game[TURNS_LEFT_INDEX] - 1
+    turnsLeft = ((game >> 2) & 0b1111) - 1
     #reset turn state
     dicesIndex = 255 #255 should raise index out of bounds if access is attempted
     rollsLeft = 3
@@ -130,7 +130,8 @@ def claimCategory(
 
 def getLegalClaims(game: Game) -> list[int]:
     '''Get a list of legal (possibly zero-score) claims via category indexes.'''
-    categoriesAvailable = [i for i in range(ONES, YAHTZEE) if not ((game[USED_CATEGORIES_INDEX] >> i) & 1)]
+    usedCategories = game >> 20
+    categoriesAvailable = [i for i in range(ONES, YAHTZEE) if not ((usedCategories >> i) & 1)]
     categoriesAvailable.append(YAHTZEE) #yahtzee can be scored multiple times
     return categoriesAvailable
     
