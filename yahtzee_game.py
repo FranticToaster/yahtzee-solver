@@ -137,7 +137,7 @@ def getLegalClaims(game: Game) -> list[int]:
 
 #tests are broken for now
 if __name__ == "__main__":
-    from yahtzee_init import availableRerolls
+    from yahtzee_init import *
     from yahtzee_tests import *
     
     game = initGame()
