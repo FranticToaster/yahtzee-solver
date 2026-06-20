@@ -92,7 +92,7 @@ def _precomputeDicesAdditionByIdx(dicesToIdx, idxToDices) -> list[list[int]]:
 
             newDices = tuple(x + y for x,y in zip(dices_i, dices_j))
             if sum(newDices) > 5:
-                row.append(255)
+                row.append(255) # 255 should raise index out of bounds if access is attempted
                 continue
 
             row.append(dicesToIdx[newDices])
