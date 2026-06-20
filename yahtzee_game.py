@@ -8,12 +8,14 @@ logger = logging.getLogger(__name__)
 type Game = tuple[int, int, int, Dices, int]
 type GameAsInt = int
 type GameWithDiceAsIndex = tuple[int, int, int, int, int] #dices represented as index
-#access indexes
-TURNS_LEFT_INDEX = 0
-USED_CATEGORIES_INDEX = 1
-UPPER_SECTION_SCORE_INDEX = 2
-DICES_INDEX = 3
-ROLLS_LEFT_INDEX = 4
+
+
+# Within GameAsInt, in order from right to left in bitpacked int:
+# rollsLeft (max value 3; size 2 bits; offset 0 bits)
+# turnsLeft (max value 13; size 4 bits; offset 2 bits)
+# upperSectionScore (max value 63; size 6 bits; offset 6 bits)
+# dicesIdx (max value 251; size 8 bits; offset 12 bits)
+# usedCategories (13 bit mask, max value 0b1111111111111; size 13 bits; offset 20 bits)
 
 
 def initGame() -> GameAsInt:
@@ -151,12 +153,17 @@ if __name__ == "__main__":
     for claims,expectedUsed,expectedUpperSectionScore in gameTests:
         game = initGame()
         for dices,category,expectedScore in claims:
-            game = (*game[:3], dices, game[4])
-            game, claimResult = claimCategory(game, category)
+            dicesIdx = dicesToIdx[dices]
+            game = (
+                game
+                & ~(0b11111111 << 12)
+                | (dicesIdx << 12)
+            )
+            _, claimResult = claimCategory(game, category)
             if claimResult != expectedScore:
                 print(f"Failed game claim score test case: Expected {expectedScore} but got {claimResult}.")
         if (
-            game[USED_CATEGORIES_INDEX] != expectedUsed
-            or game[UPPER_SECTION_SCORE_INDEX] != expectedUpperSectionScore
+            game >> 20 != expectedUsed
+            or (game >> 6) & 0b111111 != expectedUpperSectionScore
         ):
             print(f"Failed game result test case: Expected used categories {expectedUsed} and upper section score {expectedUpperSectionScore}.")
