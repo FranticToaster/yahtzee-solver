@@ -29,7 +29,7 @@ total_nodes_evaluated = 0
 #@line_profiler.profile
 # use gameInt (bitpacked) instead of separate args for faster caching
 #TODO: ensure sum=5 dice combinations fit within 256
-def dfs(gameInt: gameAsInt) -> float:
+def dfs(gameInt: GameAsInt) -> float:
     global total_nodes_evaluated, leaf_nodes_evaluated
     total_nodes_evaluated += 1
     
