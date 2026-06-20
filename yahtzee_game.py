@@ -9,6 +9,13 @@ type Game = tuple[int, int, int, Dices, int]
 type GameAsInt = int
 type GameWithDiceAsIndex = tuple[int, int, int, int, int] #dices represented as index
 
+# Access Indexes
+TURNS_LEFT_INDEX = 0
+USED_CATEGORIES_INDEX = 1
+UPPER_SECTION_SCORE_INDEX = 2
+DICES_INDEX = 3
+ROLLS_LEFT_INDEX = 4
+
 
 # Within GameAsInt, in order from right to left in bitpacked int:
 # rollsLeft (max value 3; size 2 bits; offset 0 bits)
@@ -23,8 +30,8 @@ def initGame() -> GameAsInt:
         (13 << 2) #turnsLeft
         | (0 << 20) #usedCategories
         | (0 << 6) #upperSectionScore
-        | (255 << 12) #dices; 256 should raise index out of bounds if access is attempted
-        | 3, #rollsLeft
+        | (255 << 12) #dices; 255 should raise index out of bounds if access is attempted
+        | 3 #rollsLeft
     )
 
 
