@@ -1,4 +1,5 @@
 import logging
+from typing import cast
 from yahtzee_locals import *
 from yahtzee_config import *
 from yahtzee_init import *
@@ -27,11 +28,22 @@ ROLLS_LEFT_INDEX = 4
 
 def initGame() -> GameAsInt:
     return (
-        (13 << 2) #turnsLeft
+        (3 << 2) #turnsLeft
         | (0 << 20) #usedCategories
         | (0 << 6) #upperSectionScore
         | (255 << 12) #dices; 255 should raise index out of bounds if access is attempted
         | 3 #rollsLeft
+    )
+
+
+def initGameAsTuple() -> Game:
+    '''For convenience of tests; should not be used in solver.'''
+    return (
+        3, #turnsLeft
+        0, #usedCategories
+        0, #upperSectionScore
+        (0, 0, 0, 0, 0, 0), #dices
+        3, #rollsLeft
     )
 
 
@@ -52,7 +64,7 @@ def moveFitsReq(
         )
     
     elif category == LARGE_STRAIGHT:
-        return (dices == [1,1,1,1,1,0] or dices == [0,1,1,1,1,1])
+        return (dices == (1,1,1,1,1,0) or dices == (0,1,1,1,1,1))
     
     elif category == THREE_OF_A_KIND:
         return any(dices[i] >= 3 for i in range(6))
@@ -142,12 +154,10 @@ def getLegalClaims(game: Game) -> list[int]:
     return categoriesAvailable
     
 
-#tests are broken for now
 if __name__ == "__main__":
     from yahtzee_init import *
     from yahtzee_tests import *
     
-    game = initGame()
     for dices,category,expected in categoryTests:
         if moveFitsReq(globals()[category.upper()], dices) != expected:
             print(f"Failed category test case: {(category, dices)}: Expected {expected}.")
@@ -158,19 +168,15 @@ if __name__ == "__main__":
             print(f"Failed reroll test case: Expected {expectedCount} but got {rerollCount}.")
     
     for claims,expectedUsed,expectedUpperSectionScore in gameTests:
-        game = initGame()
+        game = initGameAsTuple()
         for dices,category,expectedScore in claims:
-            dicesIdx = dicesToIdx[dices]
-            game = (
-                game
-                & ~(0b11111111 << 12)
-                | (dicesIdx << 12)
-            )
-            _, claimResult = claimCategory(game, category)
+            game = game[:DICES_INDEX] + (dices,) + game[DICES_INDEX + 1:]
+            game = cast(Game, game)
+            game, claimResult = claimCategory(game, category)
             if claimResult != expectedScore:
                 print(f"Failed game claim score test case: Expected {expectedScore} but got {claimResult}.")
         if (
-            game >> 20 != expectedUsed
-            or (game >> 6) & 0b111111 != expectedUpperSectionScore
+            game[USED_CATEGORIES_INDEX] != expectedUsed
+            or game[UPPER_SECTION_SCORE_INDEX] != expectedUpperSectionScore
         ):
             print(f"Failed game result test case: Expected used categories {expectedUsed} and upper section score {expectedUpperSectionScore}.")
