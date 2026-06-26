@@ -124,7 +124,7 @@ def claimCategory(
 
     moveScore = getMoveScore(game, category, game[DICES_INDEX])
     if category <= SIXES and game[UPPER_SECTION_SCORE_INDEX] < 63:
-        upperSectionScore = max(
+        upperSectionScore = min(
             63,
             upperSectionScore + moveScore
         )
