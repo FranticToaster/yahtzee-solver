@@ -12,7 +12,7 @@ logging.basicConfig(
     level = logging.INFO,
 )
 
-import line_profiler
+#import line_profiler #unsupported by pypy
 from functools import cache
 from yahtzee_game import *
 from yahtzee_init import *

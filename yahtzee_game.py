@@ -2,11 +2,13 @@ import logging
 from yahtzee_locals import *
 from yahtzee_config import *
 from yahtzee_init import *
+from typing import TypeAlias
 
 logger = logging.getLogger(__name__)
 
-type Game = tuple[int, int, int, Dices, int]
-type GameWithDiceAsIndex = tuple[int, int, int, int, int] #dices represented as index
+#use legacy TypeAlias for pre-3.12 pypy
+Game: TypeAlias = tuple[int, int, int, Dices, int]
+GameWithDiceAsIndex: TypeAlias = tuple[int, int, int, int, int] #dices represented as index
 #access indexes
 TURNS_LEFT_INDEX = 0
 USED_CATEGORIES_INDEX = 1
