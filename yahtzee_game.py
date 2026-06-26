@@ -45,7 +45,7 @@ def moveFitsReq(
         )
     
     elif category == LARGE_STRAIGHT:
-        return (dices == [1,1,1,1,1,0] or dices == [0,1,1,1,1,1])
+        return (dices == (1,1,1,1,1,0) or dices == (0,1,1,1,1,1))
     
     elif category == THREE_OF_A_KIND:
         return any(dices[i] >= 3 for i in range(6))
@@ -105,7 +105,7 @@ def claimCategory(
 
     moveScore = getMoveScore(game, category, (game >> 12) & 0b11111111)
     if category <= SIXES and upperSectionScore < 63:
-        upperSectionScore = max(
+        upperSectionScore = min(
             63,
             upperSectionScore + moveScore
         )
