@@ -7,6 +7,7 @@ __all__ = [
 ]
 
 import logging
+from sys import version
 from time import perf_counter
 from math import prod
 from itertools import product, combinations_with_replacement
@@ -15,6 +16,7 @@ from yahtzee_config import dieWeights, dieWeightsSum
 
 
 _logger = logging.getLogger(__name__)
+_logger.info(f"VERSION {version}")
 _start_time = perf_counter()
 _logger.info("Initialization started.")
 

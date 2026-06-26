@@ -1,11 +1,13 @@
 import logging
 import os
+from datetime import datetime
 
 DIR_PATH = os.path.dirname(os.path.abspath(__file__))
 
 logger = logging.getLogger(__name__)
+timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 logging.basicConfig(
-    filename = os.path.join(DIR_PATH, f"searchLog.log"),
+    filename = os.path.join(DIR_PATH, f"search_log_{timestamp}.log"),
     filemode = "w",
     format = "%(asctime)s [%(levelname)s] %(filename)s: %(message)s",
     datefmt = "%Y-%m-%d %H:%M:%S",
