@@ -40,7 +40,7 @@ def moveFitsReq(
     elif category == SMALL_STRAIGHT:
         return any(
             all(dices[j] > 0 for j in range(i, i + 4))
-            for i in range(2)
+            for i in range(3)
         )
     
     elif category == LARGE_STRAIGHT:

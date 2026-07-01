@@ -23,6 +23,8 @@ categoryTests = [
     # Small Straight
     ((1,1,1,1,0,1), "small_straight", True),
     ((1,2,1,1,0,0), "small_straight", True),
+    ((0,1,1,1,2,0), "small_straight", True),
+    ((0,0,2,1,1,1), "small_straight", True),
     ((1,1,1,0,1,1), "small_straight", False),
 
     # Large Straight
