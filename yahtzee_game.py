@@ -34,7 +34,7 @@ def moveFitsReq(
     '''Checks if a category claim fits the requirements of the category.
     Does not check if category has been used.'''
     #big elif block below
-    if ONES <= category <= SIXES:
+    if category <= SIXES:
         return (dices[category] > 0)
     
     elif category == SMALL_STRAIGHT:
@@ -79,7 +79,7 @@ def getMoveScore(
     if constScore is not None:
         return constScore
     
-    elif ONES <= category <= SIXES:
+    elif category <= SIXES:
         return dices[category] * (category + 1)
     
     # special Yahtzee logic, edit if needed
@@ -103,7 +103,7 @@ def claimCategory(
     upperSectionScore = game[UPPER_SECTION_SCORE_INDEX]
 
     moveScore = getMoveScore(game, category, game[DICES_INDEX])
-    if category <= SIXES and game[UPPER_SECTION_SCORE_INDEX] < 63:
+    if category <= SIXES:
         upperSectionScore = min(
             63,
             upperSectionScore + moveScore
