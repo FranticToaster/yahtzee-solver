@@ -1,7 +1,8 @@
-from typing import TypeAlias #use legacy TypeAlias for pre-3.12 pypy
+from typing import TypeAlias  # use legacy TypeAlias for pre-3.12 pypy
+
 Category: TypeAlias = int
 
-#DO NOT change these constants or else tests/even the code itself may break.
+# DO NOT change these constants or else tests/even the code itself may break.
 ONES: Category = 0
 TWOS: Category = 1
 THREES: Category = 2
@@ -15,5 +16,6 @@ FOUR_OF_A_KIND: Category = 9
 FULL_HOUSE: Category = 10
 CHANCE: Category = 11
 YAHTZEE: Category = 12
+NULL: Category = 13
 
 Dices: TypeAlias = tuple[int, ...]
