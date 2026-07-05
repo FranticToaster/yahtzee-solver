@@ -7,14 +7,15 @@ from typing import TypeAlias
 logger = logging.getLogger(__name__)
 
 #use legacy TypeAlias for pre-3.12 pypy
-Game: TypeAlias = tuple[int, int, int, Dices, int]
-GameWithDiceAsIndex: TypeAlias = tuple[int, int, int, int, int] #dices represented as index
+Game: TypeAlias = tuple[int, int, int, Dices, int, bool]
+GameWithDiceAsIndex: TypeAlias = tuple[int, int, int, int, int, bool] #dices represented as index
 #access indexes
 TURNS_LEFT_INDEX = 0
 USED_CATEGORIES_INDEX = 1
 UPPER_SECTION_SCORE_INDEX = 2
 DICES_INDEX = 3
 ROLLS_LEFT_INDEX = 4
+YAHTZEE_DISABLED_INDEX = 5
 
 
 def initGame() -> GameWithDiceAsIndex:
@@ -24,13 +25,15 @@ def initGame() -> GameWithDiceAsIndex:
         0, #upperSectionScore
         999, #dices; 999 should raise index out of bounds if access is attempted
         3, #rollsLeft
+        false, #yahtzeeDisabled
     )
 
 
 def moveFitsReq(
         category: Category,
-        dices: Dices,
+        game: Game,
 ) -> bool:
+    dices = game[DICES_INDEX]
     '''Checks if a category claim fits the requirements of the category.
     Does not check if category has been used.'''
     #big elif block below
@@ -59,7 +62,7 @@ def moveFitsReq(
         return True
     
     elif category == YAHTZEE:
-        return (5 in dices)
+        return (not game[YAHTZEE_DISABLED_INDEX] and 5 in dices)
     
     else:
         logger.error(f"Invalid Category passed to moveFitsReq function: {category}.")
@@ -72,7 +75,7 @@ def getMoveScore(
         dices: Dices,
 ) -> int:
     '''Gets the score of claiming a category.'''
-    if not moveFitsReq(category, dices):
+    if not moveFitsReq(category, game):
         return 0
     
     constScore = constScoreCategories[category]
@@ -91,7 +94,7 @@ def getMoveScore(
         )
 
     else:
-        return sum(count * (i+1) for i,count in enumerate(game[DICES_INDEX]))
+        return sum(count * (i+1) for i,count in enumerate(dices))
         
 
 
@@ -104,11 +107,18 @@ def claimCategory(
 
     moveScore = getMoveScore(game, category, game[DICES_INDEX])
     if category <= SIXES:
-        upperSectionScore = min(
-            63,
-            upperSectionScore + moveScore
-        )
-    
+        previousScore = upperSectionScore
+        upperSectionScore += moveScore
+        
+        if upperSectionScore >= 63:
+            upperSectionScore = 63
+            if previousScore < 63:
+                moveScore += 35
+
+    yahtzeeDisabled = (
+        game[YAHTZEE_DISABLED_INDEX]
+        or (category == YAHTZEE and moveScore == 0)
+    )
 
     usedCategories = game[USED_CATEGORIES_INDEX] | (1 << category)
     
@@ -123,6 +133,7 @@ def claimCategory(
         upperSectionScore,
         dicesIndex,
         rollsLeft,
+        yahtzeeDisabled,
     )
 
     return newGame, moveScore
