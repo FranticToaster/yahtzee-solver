@@ -22,7 +22,7 @@ YAHTZEE_DISABLED_INDEX = 5
 
 def initGame() -> GameWithDiceAsIndex:
     return (
-        13,  # turnsLeft
+        4,  # turnsLeft
         0,  # usedCategories
         0,  # upperSectionScore
         999,  # dices; 999 should raise index out of bounds if access is attempted
@@ -33,7 +33,7 @@ def initGame() -> GameWithDiceAsIndex:
 
 def initGameWithDicesAsTuple() -> Game:
     return (
-        13,
+        4,
         0,
         0,
         (0, 0, 0, 0, 0, 0),

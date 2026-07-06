@@ -77,7 +77,12 @@ def dfs(
             gameCopy, jokerBonus = claimCategory(gameCopy, category[1], True)
             claimedScore += jokerBonus
 
-        score = claimedScore + dfs(*gameCopy)
+
+        score = claimedScore + dfs(
+            *gameCopy[:DICES_INDEX],
+            dicesToIdx[gameCopy[DICES_INDEX]],
+            *gameCopy[DICES_INDEX + 1:]
+        )
 
         if score > best_score:
             best_score = score
