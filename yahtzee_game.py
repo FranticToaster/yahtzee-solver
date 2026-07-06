@@ -164,7 +164,7 @@ def getLegalClaims(game: Game) -> list[tuple[Category, Category]]:
     if not (usedCategories & (1 << YAHTZEE)):
         categoriesAvailable.append((YAHTZEE, NULL))
     # joker rule
-    elif not game[YAHTZEE_DISABLED_INDEX]:
+    elif not game[YAHTZEE_DISABLED_INDEX] and 5 in game[DICES_INDEX]:
         availableUpperSectionCategory: Category = game[DICES_INDEX].index(5)
 
         # prioritize upper section category
