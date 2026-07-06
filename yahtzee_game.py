@@ -113,8 +113,7 @@ def claimCategory(
 ) -> tuple[GameWithDiceAsIndex, int]:
     """Claim category and update internals. Does not check for validity."""
     if category == NULL:
-        newGame = (-1, -1, -1, -1, -1, False)  # unused anyway
-        return newGame, 0
+        return game, 0
 
     upperSectionScore = game[UPPER_SECTION_SCORE_INDEX]
 
