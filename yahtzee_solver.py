@@ -73,9 +73,11 @@ def dfs(
     best_score = -1.0
     for category in getLegalClaims(game):
         gameCopy, claimedScore = claimCategory(game, category[0])
-        gameCopy, jokerBonus = claimCategory(gameCopy, category[1])
+        if category[1] != NULL:
+            gameCopy, jokerBonus = claimCategory(gameCopy, category[1], True)
+            claimedScore += jokerBonus
 
-        score = claimedScore + jokerBonus + dfs(*gameCopy)
+        score = claimedScore + dfs(*gameCopy)
 
         if score > best_score:
             best_score = score

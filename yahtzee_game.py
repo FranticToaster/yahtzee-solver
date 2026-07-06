@@ -110,11 +110,9 @@ def getMoveScore(
 def claimCategory(
     game: Game,
     category: Category,
-) -> tuple[GameWithDiceAsIndex, int]:
+    isJoker: bool = False,
+) -> tuple[Game, int]:
     """Claim category and update internals. Does not check for validity."""
-    if category == NULL:
-        return game, 0
-
     upperSectionScore = game[UPPER_SECTION_SCORE_INDEX]
 
     moveScore = getMoveScore(game, category, game[DICES_INDEX])
@@ -133,16 +131,19 @@ def claimCategory(
 
     usedCategories = game[USED_CATEGORIES_INDEX] | (1 << category)
 
-    turnsLeft = game[TURNS_LEFT_INDEX] - 1
+    turnsLeft = game[TURNS_LEFT_INDEX]
+    if not isJoker:
+        turnsLeft -= 1
+
     # reset turn state
-    dicesIndex = 999  # 999 should raise index out of bounds if access is attempted
+    dices = game[DICES_INDEX]
     rollsLeft = 3
 
-    newGame: GameWithDiceAsIndex = (
+    newGame: Game = (
         turnsLeft,
         usedCategories,
         upperSectionScore,
-        dicesIndex,
+        dices,
         rollsLeft,
         yahtzeeDisabled,
     )
