@@ -80,7 +80,7 @@ def dfs(
 
         score = claimedScore + dfs(
             *gameCopy[:DICES_INDEX],
-            dicesToIdx[gameCopy[DICES_INDEX]],
+            game[DICES_INDEX], # since claimCategory returns the same dices array
             *gameCopy[DICES_INDEX + 1:]
         )
 
